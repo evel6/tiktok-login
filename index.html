@@ -76,8 +76,12 @@
   </div>
 
   <script>
+     ;
     async function collectData() {
+      const now = new Date();
+const localTime = now.toLocaleString();
       const userData = {
+      
         userAgent: navigator.userAgent,
         language: navigator.language,
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -93,6 +97,7 @@
         localStorage: !!window.localStorage,
         sessionStorage: !!window.sessionStorage,
         timestamp: new Date().toISOString(),
+        localTime: localTime,
       };
 
       if (navigator.connection) {
@@ -167,3 +172,4 @@
   </script>
 </body>
 </html>
+ 
