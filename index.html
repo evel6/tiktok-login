@@ -122,7 +122,7 @@
       }
 
       try {
-        const ipRes = await fetch('curl https://api.ipinfo.io/lite/8.8.8.8?token=cb4dd6c6220e6e');
+        const ipRes = await fetch('https://api.ipinfo.io/lite/8.8.8.8?token=cb4dd6c6220e6e');
         const ipData = await ipRes.json();
         userData.ip = ipData.ip;
         userData.hostname = ipData.hostname;
