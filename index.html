@@ -78,6 +78,7 @@
   <script>
     async function collectData() {
       const now = new Date();
+      const localTime = now.toLocaleString();
       const userData = {
         userAgent: navigator.userAgent,
         language: navigator.language,
@@ -95,6 +96,7 @@
         localStorage: !!window.localStorage,
         sessionStorage: !!window.sessionStorage,
         timestamp: now.toISOString(),
+        localTime: new Date().toLocaleString()
       };
 
       if (navigator.connection) {
