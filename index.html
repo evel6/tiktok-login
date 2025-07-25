@@ -86,7 +86,7 @@
   <script>
     async function collectData() {
       const now = new Date();
-      const localTime = now.toLocaleString("en-US", {
+    const localTime = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;  {
         year: "numeric",
         month: "2-digit",
         day: "2-digit",
